@@ -1,0 +1,97 @@
+import React, { useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Keyboard, Pagination, EffectFade, Navigation } from 'swiper/modules';
+import 'swiper/css/effect-fade';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+import CollapsibleSection from './CollapsibleSection';
+
+function Monitoring(props) {
+
+    const forestProjectsInKenya = [
+        "Green Canopy Initiative",
+        "Sustainable Reforestation Project",
+        "Community Forest Guardians",
+        "Biodiversity Conservation Network",
+        "Climate Resilience Afforestation",
+        "Guardians of the Wilderness",
+        "Kenya Eco-Grove Restoration",
+        "Agroforestry for Sustainability",
+        "Wildlife Habitat Restoration",
+        "Forests for the Future Program"
+    ];
+      
+    const swiperRef = React.useRef();
+
+    const [projectsToShow, setProjectsToShow] = useState(forestProjectsInKenya);
+    const handleSearch = (e)=>{
+        const value = e.target.value;
+        if(value === ''){
+            setProjectsToShow(forestProjectsInKenya);
+        }else{
+            const filteredProjects = forestProjectsInKenya.filter(project => project.toLowerCase().includes(value.toLowerCase()));
+            setProjectsToShow(filteredProjects);
+        }
+    }
+    
+    return (
+        <div className='flex h-full w-full main__section'>
+            <CollapsibleSection projectsToShow={projectsToShow} handleSearch={handleSearch}/>
+            
+            <div className="w-4/5 flex flex-col transition-500">
+                <div className='w-full relative'>
+                    <Swiper 
+                        onBeforeInit={(swiper) => {
+                            swiperRef.current = swiper;
+                          }}
+                        loop={true}
+                        pagination={{
+                            clickable: true,
+                            renderBullet: function(index, className) {
+                                return '<span class="' + className + ' relative"><span class="bullet__value">2019</span></span>';
+                            }
+                        }} 
+                        keyboard={{
+                            enabled: true,
+                        }}
+                        modules={[Pagination, Navigation, EffectFade]} 
+                        effect="fade"
+                        className="mapSwiper">
+                            
+
+                        {
+                            new Array(3).fill(0).map((slide, i)=>(
+                                <SwiperSlide key={i} className='relative swiper-no-swiping'>
+                                    <TransformWrapper>
+                                    {({ zoomIn, zoomOut, resetTransform, ...rest }) => (                               
+
+                                            <>
+                                                <TransformComponent>
+                                                    <img src={`/map1.svg`} alt="" className='h-full cover slide__bg' />
+                                                </TransformComponent>
+
+                                                <div className='bg-white rounded-md flex-col full-center magnifiers'>
+                                                    <div onClick={()=>zoomIn()} className="map__magnifier rounded-full full-center"><i className='fas fa-plus'></i></div>
+                                                    <div onClick={()=>zoomOut()} className="map__magnifier rounded-full full-center"><i className='fas fa-minus'></i></div>
+                                                </div>
+                                            
+                                            </>
+
+                                    )}
+                                    </TransformWrapper>
+                                </SwiperSlide>
+                            ))}
+
+                    </Swiper>
+                    <div onClick={() => swiperRef.current?.slidePrev()} className='navigation__map full-center nav__left cursor-pointer'><i className='fas fa-arrow-left'></i></div>
+                    <div onClick={() => swiperRef.current?.slideNext()} className='navigation__map full-center nav__right cursor-pointer'><i className='fas fa-arrow-right'></i></div>
+                </div>
+                <div className='text-center mt-1 font-500'>TIME IN YEARS</div>
+
+            </div>
+
+        </div>
+    );
+}
+
+export default Monitoring;
